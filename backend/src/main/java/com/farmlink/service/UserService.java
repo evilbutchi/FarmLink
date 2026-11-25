@@ -1,7 +1,8 @@
 package com.farmlink.service;
 
-import com.farmlink.dto.AdminDashboardResponse;
+import com.farmlink.dto.ChangePasswordRequest;
 import com.farmlink.dto.RegisterRequest;
+import com.farmlink.dto.UpdateProfileRequest;
 import com.farmlink.dto.UserResponse;
 import com.farmlink.exception.DuplicateEmailException;
 import com.farmlink.exception.FieldValidationException;
@@ -15,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,7 +40,6 @@ public class UserService {
     public UserResponse register(RegisterRequest req) {
         Map<String, String> errors = new LinkedHashMap<>();
 
-        // Admins can never self-register; they are provisioned by the bootstrap seeder.
         if (req.role() != Role.FARMER && req.role() != Role.BUYER) {
             errors.put("role", "Choose Farmer or Buyer");
         }
@@ -97,25 +97,68 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    @Transactional(readOnly = true)
-    public AdminDashboardResponse adminDashboard() {
-        List<UserResponse> recent = userRepository.findAllByOrderByCreatedAtDesc().stream()
-                .limit(5)
-                .map(UserResponse::from)
-                .toList();
-        return new AdminDashboardResponse(
-                userRepository.count(),
-                userRepository.countByRole(Role.FARMER),
-                userRepository.countByRole(Role.BUYER),
-                userRepository.countByRole(Role.ADMIN),
-                recent);
+    /**
+     * Updates the profile of the given (already authenticated) user. The target account is always
+     * the one identified by the session, never by a client-supplied id.
+     */
+    @Transactional
+    public UserResponse updateProfile(String email, UpdateProfileRequest req) {
+        User user = findAuthenticatedUser(email);
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (user.getRole() == Role.FARMER) {
+            if (isBlank(req.farmName())) {
+                errors.put("farmName", "Farm name is required for farmers");
+            }
+            if (isBlank(req.farmLocation())) {
+                errors.put("farmLocation", "Farm location is required for farmers");
+            }
+        } else if (req.buyerType() == null) {
+            errors.put("buyerType", "Select a buyer type");
+        }
+        if (!errors.isEmpty()) {
+            throw new FieldValidationException(errors);
+        }
+
+        user.setFullName(req.fullName().trim());
+        user.setPhone(blankToNull(req.phone()));
+        if (user.getRole() == Role.FARMER) {
+            user.setFarmName(req.farmName().trim());
+            user.setFarmLocation(req.farmLocation().trim());
+        } else {
+            user.setBuyerType(req.buyerType());
+            user.setDeliveryAddress(blankToNull(req.deliveryAddress()));
+        }
+        return UserResponse.from(userRepository.save(user));
     }
 
-    @Transactional(readOnly = true)
-    public List<UserResponse> listAllUsers() {
-        return userRepository.findAllByOrderByCreatedAtDesc().stream()
-                .map(UserResponse::from)
-                .toList();
+    /** Changes the password of the authenticated user after verifying the current one. */
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest req) {
+        User user = findAuthenticatedUser(email);
+
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (!passwordEncoder.matches(req.currentPassword(), user.getPasswordHash())) {
+            errors.put("currentPassword", "Current password is incorrect");
+        }
+        if (!req.newPassword().equals(req.confirmNewPassword())) {
+            errors.put("confirmNewPassword", "Passwords do not match");
+        } else if (req.newPassword().equals(req.currentPassword())) {
+            errors.put("newPassword", "New password must be different from the current password");
+        }
+        if (!errors.isEmpty()) {
+            throw new FieldValidationException(errors);
+        }
+
+        // The old hash is overwritten, so the previous password can no longer authenticate.
+        user.setPasswordHash(passwordEncoder.encode(req.newPassword()));
+        user.setPasswordChangedAt(Instant.now());
+        userRepository.save(user);
+    }
+
+    private User findAuthenticatedUser(String email) {
+        return userRepository.findByEmail(normalizeEmail(email))
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     private static boolean isBlank(String s) {

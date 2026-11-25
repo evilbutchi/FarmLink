@@ -6,7 +6,6 @@ const AuthContext = createContext(null)
 export const ROLE_HOME = {
   FARMER: '/farmer',
   BUYER: '/buyer',
-  ADMIN: '/admin',
 }
 
 export function AuthProvider({ children }) {
@@ -44,8 +43,11 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  // Lets pages (e.g. the profile page) push fresh user data into the shared state.
+  const updateUser = useCallback((u) => setUser(u), [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )
