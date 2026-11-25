@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { api } from '../api'
 
 const BUYER_TYPE = { HOUSEHOLD: 'Household', RESTAURANT: 'Small restaurant', STORE: 'Store' }
@@ -58,6 +59,9 @@ export default function ProfileDashboard({ role }) {
               <dd>{new Date(p.createdAt).toLocaleDateString()}</dd>
             </div>
           </dl>
+          <p style={{ marginBottom: 0 }}>
+            <Link to="/profile">Edit profile or change password</Link>
+          </p>
         </section>
 
         <section className="card">

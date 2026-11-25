@@ -76,6 +76,12 @@ input.invalid { border-color: var(--danger); }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 @media (max-width: 520px) { .two-col { grid-template-columns: 1fr; } }
 
+.forgot-row { text-align: right; margin: -.4rem 0 .6rem; font-size: .88rem; }
+input[readonly] { background: #f1f4f2; color: var(--muted); cursor: not-allowed; }
+.form-card { margin: 0; }
+.form-card label { display: block; font-weight: 600; font-size: .9rem; margin-bottom: .85rem; }
+a.btn { text-align: center; }
+
 .alert { padding: .65rem .85rem; border-radius: 8px; margin-bottom: 1rem; font-size: .92rem; }
 .alert-error { background: var(--danger-bg); color: var(--danger); }
 .alert-success { background: var(--ok-bg); color: var(--green-900); }
@@ -135,7 +141,6 @@ input.invalid { border-color: var(--danger); }
 }
 .badge-farmer { background: #fff3cf; color: #7a5b00; }
 .badge-buyer { background: #dcecff; color: #1d4f91; }
-.badge-admin { background: #f1dcf7; color: #6b1f80; }
 
 /* Dashboard bits */
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }

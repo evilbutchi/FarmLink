@@ -5,8 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ProfileDashboard from './pages/ProfileDashboard'
-import AdminDashboard from './pages/AdminDashboard'
-import AdminUsers from './pages/AdminUsers'
+import Profile from './pages/Profile'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 function Home() {
   const { user, loading } = useAuth()
@@ -20,6 +21,8 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Authenticated area: every child route is role-restricted. */}
       <Route
@@ -46,18 +49,10 @@ export default function App() {
           }
         />
         <Route
-          path="/admin"
+          path="/profile"
           element={
-            <ProtectedRoute roles={['ADMIN']}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute roles={['ADMIN']}>
-              <AdminUsers />
+            <ProtectedRoute roles={['FARMER', 'BUYER']}>
+              <Profile />
             </ProtectedRoute>
           }
         />

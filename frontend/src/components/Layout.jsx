@@ -8,16 +8,14 @@ const MENUS = {
     { label: 'My Listings' },
     { label: 'Orders' },
     { label: 'Sales' },
+    { label: 'My Profile', to: '/profile' },
   ],
   BUYER: [
     { label: 'Dashboard', to: '/buyer', end: true },
     { label: 'Browse Produce' },
     { label: 'Cart' },
     { label: 'My Orders' },
-  ],
-  ADMIN: [
-    { label: 'Dashboard', to: '/admin', end: true },
-    { label: 'Users', to: '/admin/users' },
+    { label: 'My Profile', to: '/profile' },
   ],
 }
 

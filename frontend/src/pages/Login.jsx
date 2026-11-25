@@ -44,6 +44,9 @@ export default function Login() {
         {location.state?.registered && (
           <div className="alert alert-success">Account created. You can log in now.</div>
         )}
+        {location.state?.passwordReset && (
+          <div className="alert alert-success">Your password has been reset. Log in with your new password.</div>
+        )}
         {error && <div className="alert alert-error" role="alert">{error}</div>}
 
         <label>
@@ -69,6 +72,10 @@ export default function Login() {
           />
           {fieldErrors.password && <span className="field-error">{fieldErrors.password}</span>}
         </label>
+
+        <div className="forgot-row">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </div>
 
         <button className="btn btn-primary" disabled={submitting}>
           {submitting ? 'Logging in…' : 'Log in'}

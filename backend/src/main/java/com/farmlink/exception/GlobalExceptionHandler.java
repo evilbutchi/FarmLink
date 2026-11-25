@@ -32,6 +32,11 @@ public class GlobalExceptionHandler {
                 .body(new ApiError("Please fix the highlighted fields", ex.getErrors()));
     }
 
+    @ExceptionHandler(InvalidResetTokenException.class)
+    public ResponseEntity<ApiError> handleInvalidResetToken(InvalidResetTokenException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiError.of(ex.getMessage()));
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleUnreadable(HttpMessageNotReadableException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -53,7 +58,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ResponseEntity<ApiError> handleDisabled(DisabledException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ApiError.of("This account has been disabled. Contact an administrator."));
+                .body(ApiError.of("This account has been disabled."));
     }
 
     @ExceptionHandler(AuthenticationException.class)

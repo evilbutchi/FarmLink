@@ -45,10 +45,12 @@ public class SecurityConfig {
                 // Role-based access control enforced on the server for every API route.
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/auth/csrf", "/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/csrf", "/api/auth/register", "/api/auth/login",
+                                "/api/auth/forgot-password", "/api/auth/reset-password",
+                                "/api/auth/reset-password/validate").permitAll()
+                        .requestMatchers("/api/profile/**").hasAnyRole("FARMER", "BUYER")
                         .requestMatchers("/api/farmer/**").hasRole("FARMER")
                         .requestMatchers("/api/buyer/**").hasRole("BUYER")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll())
 

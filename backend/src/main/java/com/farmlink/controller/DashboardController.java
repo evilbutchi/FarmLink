@@ -1,6 +1,5 @@
 package com.farmlink.controller;
 
-import com.farmlink.dto.AdminDashboardResponse;
 import com.farmlink.dto.ProfileDashboardResponse;
 import com.farmlink.service.UserService;
 import org.springframework.security.core.Authentication;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Role-specific dashboard endpoints. Access is restricted per role in SecurityConfig
- * (/api/farmer/** -> FARMER, /api/buyer/** -> BUYER, /api/admin/** -> ADMIN).
+ * (/api/farmer/** -> FARMER, /api/buyer/** -> BUYER).
  */
 @RestController
 @RequestMapping("/api")
@@ -32,10 +31,5 @@ public class DashboardController {
     public ProfileDashboardResponse buyerDashboard(Authentication authentication) {
         var profile = userService.getByEmail(authentication.getName());
         return new ProfileDashboardResponse("Welcome back, " + profile.fullName(), profile);
-    }
-
-    @GetMapping("/admin/dashboard")
-    public AdminDashboardResponse adminDashboard() {
-        return userService.adminDashboard();
     }
 }
